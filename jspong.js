@@ -43,6 +43,8 @@ var upPressed = false;
 var downPressed = false;
 var wPressed = false;
 var sPressed = false;
+var leftScore = 0;
+var rightScore = 0;
 const game = {
     config: config,
     canvas: canvas,
@@ -60,22 +62,13 @@ const game = {
         return bRight > pLeft && bTop < pBottom && bLeft < pRight && bBottom > pTop
     },
     keyEvents: (_) => {
-        // TODO: key listener events
         document.addEventListener('keydown', keyDownHandler, false);
         document.addEventListener('keyup', keyUpHandler, false);
     },
     loop: (_) => {
-        
-        // clear canvas
         canvas.context = canvas.element.getContext("2d")
         canvas.context.fillStyle = 'black'
-        draw();
-        // TODO: implement game loop
-        // reset ball if it goes past paddle (give player time to recover)
-        // add a scoreboard
-        // add sound everytime ball hits paddle or a wall? or they score?
-
-        window.requestAnimationFrame(game.loop);
+        draw();window.requestAnimationFrame(game.loop);
     },
     start: (_) => {
         window.addEventListener('load', (_) => {
@@ -118,6 +111,9 @@ function draw() {
     canvas.context.clearRect(0, 0, canvas.width, canvas.height)
     canvas.context.fillRect(0, 0, canvas.width, canvas.height);
     canvas.context.fillStyle = 'white'
+    canvas.context.font = '48px serif'
+    canvas.context.fillText(leftScore, canvas.width / 4, canvas.height / 8)
+    canvas.context.fillText(rightScore, canvas.width* 3 / 4, canvas.height / 8)
     drawPaddle()
     drawMiddleLine()
     drawBall()
@@ -145,7 +141,10 @@ function draw() {
     else if(ball.x + ball.dx < config.gridSize || ball.x + ball.dx> canvas.width) {
         ball.x = canvas.width / 2
         ball.y = canvas.height / 2
-        setTimeout(drawBall(), 3000)
+        if(ball.x + ball.dx < config.gridSize)
+           rightScore++
+        else
+            leftScore++
     }
     
     if(game.collision(ball, right) || game.collision(ball, left)) {
